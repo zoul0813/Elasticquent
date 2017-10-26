@@ -620,9 +620,9 @@ trait ElasticquentTrait
                     foreach ($inner_hit['hits']['hits'] as $value) {
                         if (isset($value['_source']) && isset($value['_nested']['field'])) {
                             if (!isset($attributes[$value['_nested']['field']])) {
-                                $attributes[$value['_nested']['field']] = [];
+                                $attributes[$value['_nested']['field']] = array_fill(0, $inner_hit['hits']['total'], null);
                             }
-                            $attributes[$value['_nested']['field']][] = $value['_source'];
+                            $attributes[$value['_nested']['field']][(int)$value['_nested']['offset']] = $value['_source'];
                         }
                     }
                 }
