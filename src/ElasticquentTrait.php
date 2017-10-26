@@ -613,6 +613,22 @@ trait ElasticquentTrait
             }
         }
 
+
+        if (isset($hit['inner_hits'])) {
+            foreach ($hit['inner_hits'] as $key => $inner_hit) {
+                if (isset($inner_hit['hits']['hits'])) {
+                    foreach ($inner_hit['hits']['hits'] as $value) {
+                        if (isset($value['_source']) && isset($value['_nested']['field'])) {
+                            if (!isset($attributes[$value['_nested']['field']])) {
+                                $attributes[$value['_nested']['field']] = [];
+                            }
+                            $attributes[$value['_nested']['field']][] = $value['_source'];
+                        }
+                    }
+                }
+            }
+        }
+
         $instance = $this::newFromBuilderRecursive($this, $attributes);
 
         // In addition to setting the attributes
@@ -727,7 +743,7 @@ trait ElasticquentTrait
                 $reflection_method = new ReflectionMethod($model, $key);
 
                 // Check if method class has or inherits Illuminate\Database\Eloquent\Model
-                if(!static::isClassInClass("Illuminate\Database\Eloquent\Model", $reflection_method->class)) {
+                if (!static::isClassInClass("Illuminate\Database\Eloquent\Model", $reflection_method->class)) {
                     $relation = $model->$key();
 
                     if ($relation instanceof Relation) {
@@ -810,7 +826,7 @@ trait ElasticquentTrait
     private static function isClassInClass($classNeedle, $classHaystack)
     {
         // Check for the same
-        if($classNeedle == $classHaystack) {
+        if ($classNeedle == $classHaystack) {
             return true;
         }
 
@@ -820,14 +836,12 @@ trait ElasticquentTrait
             /**
              * @var \ReflectionClass $parent
              */
-            if($parent->getName() == $classNeedle) {
+            if ($parent->getName() == $classNeedle) {
                 return true;
             }
             $classHaystackReflected = $parent;
         }
 
         return false;
-
     }
-
 }
