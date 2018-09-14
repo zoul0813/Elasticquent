@@ -229,7 +229,8 @@ trait ElasticquentTrait
         $sourceFields = null,
         $limit = null,
         $offset = null,
-        $sort = null
+        $sort = null,
+        $scriptFields = null
     ) {
         $instance = new static;
 
@@ -249,6 +250,10 @@ trait ElasticquentTrait
 
         if (!empty($sort)) {
             $params['body']['sort'] = $sort;
+        }
+
+        if (!empty($scriptFields)) {
+            $params['body']['script_fields'] = $scriptFields;
         }
 
         $result = $instance->getElasticSearchClient()->search($params);
